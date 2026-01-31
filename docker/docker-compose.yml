@@ -491,7 +491,7 @@ services:
     image: supabase/supavisor:2.7.4
     restart: unless-stopped
     ports:
-      - ${POSTGRES_PORT}:5432
+      - ${POSTGRES_PORT}:5434
       - ${POOLER_PROXY_PORT_TRANSACTION}:6543
     volumes:
       - /home/dwh/supabase/volumes/pooler/pooler.exs:/etc/pooler/pooler.exs:ro,z
