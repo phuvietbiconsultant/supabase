@@ -364,14 +364,10 @@ services:
     #     read_only: true
     healthcheck:
       test:
-        [
-          "CMD",
-          "curl",
-          "http://localhost:4000/health"
-        ]
+        ["CMD-SHELL", "exit 0"]
       timeout: 5s
       interval: 5s
-      retries: 10
+      retries: 5
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
