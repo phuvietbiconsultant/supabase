@@ -7,7 +7,16 @@ echo "Initializing Supabase data directory..."
 # We use find and copy files one by one to avoid overwriting existing files
 cd /docker-volumes-defaults
 find . -type f | while IFS= read -r file; do
-  target="/supabase-data/$file"
+  # Remove leading './' and validate path doesn't escape the target directory
+  clean_file="${file#./}"
+  case "$clean_file" in
+    ..*|/*) 
+      echo "Skipping suspicious file path: $file"
+      continue
+      ;;
+  esac
+  
+  target="/supabase-data/$clean_file"
   if [ ! -f "$target" ]; then
     mkdir -p "$(dirname "$target")"
     cp "$file" "$target"
