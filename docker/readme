@@ -1,0 +1,192 @@
+# Supabase – Docker Installation & Data Migration Guide
+
+This guide explains how to **install Supabase using Git**, run it with **Docker Compose**, and **move persistent data (volumes) to a new disk** safely.
+
+---
+
+## 1. Install Supabase using Git
+
+Repository:
+
+```
+https://github.com/phuvietbiconsultant/supabase.git
+```
+
+### 1.1 Stop and Remove Existing Supabase Containers
+
+If Supabase is already running, stop everything and remove containers, volumes, and orphans:
+
+```bash
+cd ~/supabase/docker
+docker compose down -v --remove-orphans
+```
+
+---
+
+### 1.2 Remove Existing Repository
+
+Remove the old Supabase repository to ensure a clean installation:
+
+```bash
+cd ~
+sudo rm -rf supabase
+```
+
+---
+
+### 1.3 Fresh Clone the Repository
+
+```bash
+git clone https://github.com/phuvietbiconsultant/supabase.git
+cd supabase/docker
+```
+
+---
+
+### 1.4 Configure Environment Variables
+
+Copy the example environment file:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` if needed to customize ports, passwords, or services.
+
+---
+
+### 1.5 Pull Docker Images and Start Supabase
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Supabase should now be running.
+
+---
+
+## 2. Move Supabase Data to a New Disk
+
+This section shows how to **store Supabase volumes on a larger disk** (for example `/mnt/data`).
+
+---
+
+### 2.1 Stop All Supabase Services
+
+```bash
+cd ~/supabase/docker
+docker compose down -v --remove-orphans
+```
+
+---
+
+### 2.2 Create Target Directory on the New Disk
+
+```bash
+sudo mkdir -p /mnt/data/supabase/volumes
+```
+
+---
+
+### 2.3 Copy Existing Volume Data
+
+This preserves existing databases, storage files, and init SQL scripts.
+
+```bash
+sudo cp -a ./volumes/* /mnt/data/supabase/volumes/
+```
+
+---
+
+### 2.4 Verify Copied Data
+
+```bash
+ls -la /mnt/data/supabase/volumes/
+```
+
+Ensure all subdirectories and files are present.
+
+---
+
+### 2.5 Remove Original Volumes Directory
+
+```bash
+sudo rm -rf ./volumes
+```
+
+---
+
+### 2.6 Create Symbolic Link to New Disk
+
+Link the original `./volumes` path to the new disk location:
+
+```bash
+ln -s /mnt/data/supabase/volumes ./volumes
+```
+
+---
+
+### 2.7 Verify the Symlink
+
+```bash
+ls -la ./volumes
+```
+
+Expected output:
+
+```
+volumes -> /mnt/data/supabase/volumes
+```
+
+---
+
+### 2.8 Set Correct Ownership
+
+Ensure Docker and your user can access the data:
+
+```bash
+sudo chown -R $(whoami):$(whoami) /mnt/data/supabase/volumes
+```
+
+---
+
+### 2.9 Start Supabase Again
+
+```bash
+docker compose up -d
+```
+
+Supabase will now run using data stored on the new disk.
+
+---
+
+## 3. Notes & Best Practices
+
+* Always stop containers before moving volumes
+* Verify data before deleting original volumes
+* Use a dedicated disk for production data
+* Backup `/mnt/data/supabase/volumes` regularly
+
+---
+
+## 4. Troubleshooting
+
+* **Permission errors** → recheck ownership (`chown`)
+* **Containers fail to start** → inspect logs:
+
+  ```bash
+  docker compose logs -f
+  ```
+* **Data missing** → confirm symlink and volume paths
+
+---
+
+## 5. References
+
+* Supabase official repository: [https://github.com/supabase/supabase](https://github.com/supabase/supabase)
+* Docker Compose documentation: [https://docs.docker.com/compose/](https://docs.docker.com/compose/)
+
+---
+
+✅ This setup provides a clean Supabase installation with persistent storage on a separate disk, suitable for production use.
