@@ -15,7 +15,7 @@ services:
       timeout: 10s
       retries: 5
     volumes:
-      - ${SUPABASE_DATA_DIR}/volumes/storage:/data:z
+      - ./volumes/storage:/data:z
 
   minio-createbucket:
     image: minio/mc
@@ -78,7 +78,7 @@ services:
       ENABLE_IMAGE_TRANSFORMATION: "true"
       IMGPROXY_URL: http://imgproxy:5001
     volumes:
-      - ${SUPABASE_DATA_DIR}/volumes/storage:/var/lib/storage:z
+      - ./volumes/storage:/var/lib/storage:z
 
   imgproxy:
     container_name: supabase-imgproxy
