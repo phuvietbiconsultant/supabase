@@ -15,20 +15,10 @@ services:
     volumes:
       - ./volumes:/docker-volumes-defaults:ro
       - ${SUPABASE_DATA_DIR}/volumes:/supabase-data
+      - ./init-volumes.sh:/init-volumes.sh:ro
     command:
       - /bin/sh
-      - -c
-      - |
-        set -e
-        echo "Initializing Supabase data directory..."
-        # Copy default config files (only if they don't exist)
-        cp -rn /docker-volumes-defaults/* /supabase-data/ || true
-        # Create required empty directories
-        mkdir -p /supabase-data/db/data
-        mkdir -p /supabase-data/db/config
-        mkdir -p /supabase-data/storage
-        mkdir -p /supabase-data/snippets
-        echo "Initialization complete."
+      - /init-volumes.sh
 
   studio:
     container_name: supabase-studio
